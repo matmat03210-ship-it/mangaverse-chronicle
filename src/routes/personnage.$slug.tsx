@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { getCharacter } from "@/data/characters";
+import { Character3D } from "@/components/Character3D";
 
 export const Route = createFileRoute("/personnage/$slug")({
   loader: ({ params }) => {
