@@ -57,19 +57,38 @@ function CharacterPage() {
 
       <section className="mx-auto max-w-5xl px-6 py-10">
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
+          <Character3D slug={character.slug} className="h-[26rem] w-full cursor-grab" />
+          <p className="px-6 py-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            Modèle 3D — glisse pour tourner, molette pour zoomer
+          </p>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
           <div className="aspect-video w-full">
             <iframe
               className="h-full w-full"
-              src={`https://www.youtube.com/embed/${character.videoId}`}
+              src={`https://www.youtube-nocookie.com/embed/${character.videoId}`}
               title={`${character.name} — ${character.videoLabel}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               loading="lazy"
             />
           </div>
-          <p className="px-6 py-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-            ▶ {character.videoLabel}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+            <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              ▶ {character.videoLabel}
+            </p>
+            <a
+              href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+                `${character.name} ${character.videoLabel}`,
+              )}`}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground"
+            >
+              Vidéo indisponible ? Ouvrir sur YouTube
+            </a>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
