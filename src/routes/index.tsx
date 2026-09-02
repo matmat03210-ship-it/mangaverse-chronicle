@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { characters } from "@/data/characters";
+import { Character3D } from "@/components/Character3D";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -84,10 +85,8 @@ function Home() {
         <h2 className="mb-6 text-2xl font-black tracking-tight">Personnages marquants</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((c) => (
-            <Link
+            <div
               key={c.slug}
-              to="/personnage/$slug"
-              params={{ slug: c.slug }}
               className="group relative overflow-hidden rounded-3xl border border-border bg-card p-6 transition-transform duration-300 hover:-translate-y-1.5"
             >
               <div
@@ -101,13 +100,23 @@ function Home() {
                 >
                   {c.role}
                 </span>
-                <h3 className="mt-4 text-3xl font-black tracking-tight">{c.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{c.tagline}</p>
-                <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-foreground/70">
-                  ▶ {c.videoLabel}
+
+                <Character3D slug={c.slug} className="mt-4 h-64 w-full cursor-grab" />
+                <p className="text-center text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Glisse pour le faire tourner
                 </p>
+
+                <h3 className="mt-3 text-3xl font-black tracking-tight">{c.name}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{c.tagline}</p>
+                <Link
+                  to="/personnage/$slug"
+                  params={{ slug: c.slug }}
+                  className="mt-5 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground"
+                >
+                  Voir sa fiche · {c.videoLabel}
+                </Link>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
         {results.length === 0 && (

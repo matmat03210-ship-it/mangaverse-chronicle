@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { getCharacter } from "@/data/characters";
+import { Character3D } from "@/components/Character3D";
 
 export const Route = createFileRoute("/personnage/$slug")({
   loader: ({ params }) => {
@@ -57,19 +58,34 @@ function CharacterPage() {
 
       <section className="mx-auto max-w-5xl px-6 py-10">
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
-          <div className="aspect-video w-full">
-            <iframe
-              className="h-full w-full"
-              src={`https://www.youtube.com/embed/${character.videoId}`}
-              title={`${character.name} — ${character.videoLabel}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="lazy"
-            />
-          </div>
+          <Character3D slug={character.slug} className="h-[26rem] w-full cursor-grab" />
           <p className="px-6 py-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-            ▶ {character.videoLabel}
+            Modèle 3D — glisse pour tourner, molette pour zoomer
           </p>
+        </div>
+
+        <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-card">
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+              `${character.name} ${character.videoLabel}`,
+            )}`}
+            target="_blank"
+            rel="noreferrer"
+            className="relative flex aspect-video w-full items-center justify-center"
+            style={{ backgroundImage: character.aura }}
+          >
+            <span className="flex h-20 w-20 items-center justify-center rounded-full bg-background/70 text-2xl backdrop-blur transition-transform hover:scale-110">
+              ▶
+            </span>
+          </a>
+          <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+            <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              ▶ {character.videoLabel} — s'ouvre sur YouTube
+            </p>
+            <span className="text-xs text-muted-foreground">
+              Les extraits Dragon Ball sont bloqués par l'éditeur en lecture intégrée
+            </span>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
