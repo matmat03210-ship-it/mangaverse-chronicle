@@ -199,7 +199,7 @@ export function Character3D({
       <Canvas
         shadows
         dpr={[1, 1.6]}
-        camera={{ position: [0, 0.6, 3.6], fov: 42 }}
+        camera={{ position: [0, 0.35, 4.6], fov: 42 }}
         gl={{ antialias: true }}
       >
         <ambientLight intensity={0.7} />
@@ -212,6 +212,7 @@ export function Character3D({
         <Figure look={look} />
         <ContactShadows position={[0, -0.92, 0]} opacity={0.45} scale={5} blur={2.4} far={3} />
         <OrbitControls
+          target={[0, 0.25, 0]}
           enablePan={false}
           enableZoom={interactive}
           enabled={interactive}
@@ -219,7 +220,7 @@ export function Character3D({
           autoRotateSpeed={1.6}
           minPolarAngle={Math.PI / 3.2}
           maxPolarAngle={Math.PI / 1.9}
-          minDistance={2.4}
+          minDistance={3}
           maxDistance={5.5}
         />
       </Canvas>
