@@ -33,9 +33,9 @@ type PartProps = {
 function Part({
   color,
   gradient,
-  position,
-  rotation,
-  scale,
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  scale = 1,
   outline = 0.012,
   children,
 }: PartProps) {
