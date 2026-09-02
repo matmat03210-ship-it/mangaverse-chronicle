@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { characters } from "@/data/characters";
+import { Character3D } from "@/components/Character3D";
 
 export const Route = createFileRoute("/")({
   head: () => ({
