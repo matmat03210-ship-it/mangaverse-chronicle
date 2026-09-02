@@ -176,14 +176,6 @@ function Figure({ look }: { look: Look }) {
   );
 }
 
-function AutoRotate({ speed }: { speed: number }) {
-  const ref = useRef<THREE.Group>(null);
-  useFrame((_, delta) => {
-    if (ref.current) ref.current.rotation.y += delta * speed;
-  });
-  return <group ref={ref} />;
-}
-
 export function Character3D({
   slug,
   interactive = true,
@@ -219,7 +211,6 @@ export function Character3D({
         </Environment>
         <Figure look={look} />
         <ContactShadows position={[0, -0.92, 0]} opacity={0.45} scale={5} blur={2.4} far={3} />
-        <AutoRotate speed={0} />
         <OrbitControls
           enablePan={false}
           enableZoom={interactive}
