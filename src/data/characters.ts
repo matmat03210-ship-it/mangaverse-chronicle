@@ -35,7 +35,7 @@ export const characters: Character[] = [
     moments: [
       "Le Kaméhaméha appris en une seule observation",
       "Super Saiyan face à Freezer sur Namek",
-      "Le Genkidama contre Boubou",
+      "Le Genkidama contre Boo",
       "L'Ultra Instinct au Tournoi du Pouvoir",
     ],
   },
@@ -57,7 +57,7 @@ export const characters: Character[] = [
       "Vegeta est le meilleur arc de rédemption du shonen. Il ne devient jamais gentil par facilité : il choisit, encore et encore, de se surpasser malgré l'échec.",
     moments: [
       "Son arrivée sur Terre avec Nappa",
-      "Le sacrifice contre Cell puis contre Boubou",
+      "Le sacrifice contre Cell puis contre Boo",
       "« C'est moi le Vegeta d'aujourd'hui ! »",
       "Le Final Flash resté culte",
     ],
@@ -155,8 +155,8 @@ export const characters: Character[] = [
     ],
   },
   {
-    slug: "boubou",
-    name: "Majin Boubou",
+    slug: "boo",
+    name: "Majin Boo",
     manga: "Dragon Ball",
     role: "Chaos rose",
     tagline: "Un enfant tout-puissant sans morale",
@@ -165,14 +165,14 @@ export const characters: Character[] = [
     power: "Transformation en bonbon, régénération infinie, absorption",
     firstAppearance: "Dragon Ball, chapitre 460 (1994)",
     videoId: "Gc7T5R2sVEg",
-    videoLabel: "Le réveil de Boubou",
+    videoLabel: "Le réveil de Boo",
     story:
-      "Arme magique millénaire, Boubou change de forme et d'humeur au gré de ceux qu'il absorbe. Tour à tour puéril, monstrueux et étrangement innocent, il finit par se réincarner en un adversaire amical.",
+      "Arme magique millénaire, Boo change de forme et d'humeur au gré de ceux qu'il absorbe. Tour à tour puéril, monstrueux et étrangement innocent, il finit par se réincarner en un adversaire amical.",
     whyIconic:
       "Le seul grand méchant de Dragon Ball qui fait peur parce qu'il ne comprend pas ce qu'il détruit.",
     moments: [
       "La destruction de la Terre en un souffle",
-      "Kid Boubou, la version la plus pure et la plus dangereuse",
+      "Kid Boo, la version la plus pure et la plus dangereuse",
       "Le Genkidama de l'humanité",
       "Sa renaissance en Oub",
     ],
