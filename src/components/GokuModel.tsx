@@ -69,7 +69,7 @@ export function GokuModel() {
     });
     const size = new THREE.Vector3();
     skinnedBox.getSize(size);
-    const scale = 2.6 / size.y;
+    const scale = 3.1 / size.y;
     clone.scale.setScalar(scale);
     const center = new THREE.Vector3();
     skinnedBox.getCenter(center);
