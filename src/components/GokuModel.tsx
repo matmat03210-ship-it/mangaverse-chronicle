@@ -42,6 +42,11 @@ export function GokuModel() {
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         mesh.material = new THREE.MeshNormalMaterial();
         console.log("[goku] mesh:", mesh.name, "mats:", mats.map((m) => m.name), "skinned:", (mesh as THREE.SkinnedMesh).isSkinnedMesh ?? false);
+        if ((mesh as THREE.SkinnedMesh).isSkinnedMesh) {
+          const sm = mesh as THREE.SkinnedMesh;
+          sm.computeBoundingBox();
+          console.log("[goku] skinned bbox:", sm.boundingBox?.min.toArray(), sm.boundingBox?.max.toArray());
+        }
       }
     });
 
