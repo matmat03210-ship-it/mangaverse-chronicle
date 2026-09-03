@@ -40,21 +40,7 @@ export function GokuModel() {
         mesh.receiveShadow = true;
         mesh.frustumCulled = false;
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
-        mesh.material = Array.isArray(mesh.material)
-          ? mats.map((m) => {
-              const tex = textures[m.name as keyof typeof textures];
-              return new THREE.MeshStandardMaterial({
-                map: tex ?? null,
-                color: tex ? "#ffffff" : "#ff8833",
-                roughness: 0.85,
-                metalness: 0,
-              });
-            })
-          : new THREE.MeshStandardMaterial({
-              map: (mats[0] ? textures[mats[0].name as keyof typeof textures] : undefined) ?? null,
-              roughness: 0.85,
-              metalness: 0,
-            });
+        mesh.material = new THREE.MeshNormalMaterial();
         console.log("[goku] mesh:", mesh.name, "mats:", mats.map((m) => m.name), "skinned:", (mesh as THREE.SkinnedMesh).isSkinnedMesh ?? false);
       }
     });
