@@ -59,14 +59,21 @@ export function GokuModel() {
       }
     });
 
-    // Normalise : recentre au sol, hauteur ~2.6 unités
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    console.log("[goku] bbox size:", size.toArray(), "min:", box.min.toArray());
-    const scale = 2.6 / Math.max(size.x, size.y, size.z);
+    // Normalise : le FBX est en Z-up (couché) — on le redresse, puis recentre au sol
+    const measure = () => {
+      const b = new THREE.Box3().setFromObject(clone);
+      const s = new THREE.Vector3();
+      b.getSize(s);
+      return { b, s };
+    };
+    let { s } = measure();
+    if (s.z > s.y * 1.5) {
+      clone.rotation.x = -Math.PI / 2;
+      ({ s } = measure());
+    }
+    const scale = 2.6 / Math.max(s.x, s.y, s.z);
     clone.scale.setScalar(scale);
-    const box2 = new THREE.Box3().setFromObject(clone);
+    const { b: box2 } = measure();
     const center = new THREE.Vector3();
     box2.getCenter(center);
     clone.position.set(-center.x, -box2.min.y - 0.9, -center.z);
