@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, useTexture } from "@react-three/drei";
 import * as THREE from "three";
+import { SkeletonUtils } from "three-stdlib";
 import gokuGlb from "@/assets/models/goku.glb.asset.json";
 import texUpper from "@/assets/models/goku-Upper.png.asset.json";
 import texLower from "@/assets/models/goku-Lower.png.asset.json";
@@ -31,7 +32,7 @@ export function GokuModel() {
   }, [textures]);
 
   const model = useMemo(() => {
-    const clone = scene.clone(true);
+    const clone = SkeletonUtils.clone(scene);
     clone.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;
