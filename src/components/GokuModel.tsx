@@ -50,24 +50,22 @@ export function GokuModel() {
       }
     });
 
-    // Normalise : le FBX est en Z-up (couché) — on le redresse, puis recentre au sol
-    const measure = () => {
-      const b = new THREE.Box3().setFromObject(clone);
-      const s = new THREE.Vector3();
-      b.getSize(s);
-      return { b, s };
-    };
-    let { s } = measure();
-    if (s.z > s.y * 1.5) {
-      clone.rotation.x = -Math.PI / 2;
-      ({ s } = measure());
-    }
-    const scale = 2.6 / Math.max(s.x, s.y, s.z);
+    // Normalise depuis la bbox *skinnée* (le rendu réel), pas les noeuds du squelette
+    const skinnedBox = new THREE.Box3();
+    clone.traverse((obj) => {
+      const sm = obj as THREE.SkinnedMesh;
+      if (sm.isSkinnedMesh) {
+        sm.computeBoundingBox();
+        if (sm.boundingBox) skinnedBox.union(sm.boundingBox);
+      }
+    });
+    const size = new THREE.Vector3();
+    skinnedBox.getSize(size);
+    const scale = 2.6 / size.y;
     clone.scale.setScalar(scale);
-    const { b: box2 } = measure();
     const center = new THREE.Vector3();
-    box2.getCenter(center);
-    clone.position.set(-center.x, -box2.min.y - 0.9, -center.z);
+    skinnedBox.getCenter(center);
+    clone.position.set(-center.x * scale, -skinnedBox.min.y * scale - 0.9, -center.z * scale);
     return clone;
   }, [scene, textures]);
 
