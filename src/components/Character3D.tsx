@@ -347,7 +347,13 @@ export function Character3D({
           <Lightformer intensity={1.6} position={[0, 4, 2]} scale={[8, 8, 1]} />
           <Lightformer intensity={0.9} color="#9ec8ff" position={[-4, 1, -2]} scale={[10, 3, 1]} />
         </Environment>
-        <Figure look={look} />
+        {slug === "goku" ? (
+          <Suspense fallback={null}>
+            <GokuModel />
+          </Suspense>
+        ) : (
+          <Figure look={look} />
+        )}
         <ContactShadows position={[0, -0.92, 0]} opacity={0.45} scale={5} blur={2.4} far={3} />
         <OrbitControls
           target={[0, 0.25, 0]}
