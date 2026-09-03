@@ -1,8 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment, Lightformer, Outlines } from "@react-three/drei";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { defaultLook, looks, type Look } from "@/data/looks";
+import { GokuModel } from "./GokuModel";
 
 /** 3-step toon ramp — donne le rendu cel-shading façon anime */
 function useToonGradient() {
