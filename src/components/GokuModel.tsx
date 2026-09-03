@@ -38,6 +38,7 @@ export function GokuModel() {
         const mesh = obj as THREE.Mesh;
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        mesh.frustumCulled = false;
         const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
         mesh.material = Array.isArray(mesh.material)
           ? mats.map((m) => {
@@ -54,6 +55,7 @@ export function GokuModel() {
               roughness: 0.85,
               metalness: 0,
             });
+        console.log("[goku] mesh:", mesh.name, "mats:", mats.map((m) => m.name), "skinned:", (mesh as THREE.SkinnedMesh).isSkinnedMesh ?? false);
       }
     });
 
