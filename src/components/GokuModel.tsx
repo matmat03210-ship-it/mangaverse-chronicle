@@ -49,7 +49,7 @@ export function GokuModel() {
               });
             })
           : new THREE.MeshStandardMaterial({
-              map: textures[mats[0].name as keyof typeof textures] ?? null,
+              map: (mats[0] ? textures[mats[0].name as keyof typeof textures] : undefined) ?? null,
               roughness: 0.85,
               metalness: 0,
             });
