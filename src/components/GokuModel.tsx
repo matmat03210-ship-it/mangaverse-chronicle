@@ -60,6 +60,7 @@ export function GokuModel() {
     const box = new THREE.Box3().setFromObject(clone);
     const size = new THREE.Vector3();
     box.getSize(size);
+    console.log("[goku] bbox size:", size.toArray(), "min:", box.min.toArray());
     const scale = 2.6 / Math.max(size.x, size.y, size.z);
     clone.scale.setScalar(scale);
     const box2 = new THREE.Box3().setFromObject(clone);
