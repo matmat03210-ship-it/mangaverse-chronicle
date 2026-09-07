@@ -75,7 +75,7 @@ export function ImportedCharacterModel({ slug }: { slug: string }) {
   const { actions } = useAnimations(animations, group);
 
   useEffect(() => {
-    const idle = actions.Idle;
+    const idle = actions["Idle"];
     if (!idle) return;
     idle.reset().fadeIn(0.25).play();
     return () => {
