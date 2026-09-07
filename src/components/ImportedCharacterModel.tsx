@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -24,10 +24,12 @@ const MODEL_URLS: Record<string, string> = {
 };
 
 const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
-  krilin: [-Math.PI / 2, 0, 0],
+  freezer: [-Math.PI / 2, 0, 0],
+  piccolo: [-Math.PI / 2, 0, 0],
+  boo: [-Math.PI / 2, 0, 0],
 };
 
-function normalizedClone(source: THREE.Group, slug: string) {
+function preparedClone(source: THREE.Group, slug: string) {
   const object = SkeletonUtils.clone(source);
   const rotation = MODEL_ROTATIONS[slug];
   if (rotation) object.rotation.set(...rotation);
@@ -52,18 +54,6 @@ function normalizedClone(source: THREE.Group, slug: string) {
     }
   });
 
-  object.updateWorldMatrix(true, true);
-  const bounds = new THREE.Box3().setFromObject(object, true);
-  const size = bounds.getSize(new THREE.Vector3());
-  const scale = 3.1 / Math.max(size.y, 0.001);
-  object.scale.multiplyScalar(scale);
-  object.updateWorldMatrix(true, true);
-
-  const scaledBounds = new THREE.Box3().setFromObject(object, true);
-  const center = scaledBounds.getCenter(new THREE.Vector3());
-  object.position.x -= center.x;
-  object.position.y += -0.9 - scaledBounds.min.y;
-  object.position.z -= center.z;
   return object;
 }
 
@@ -71,8 +61,29 @@ export function ImportedCharacterModel({ slug }: { slug: string }) {
   const url = MODEL_URLS[slug] ?? vegetaAsset.url;
   const group = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
-  const model = useMemo(() => normalizedClone(scene, slug), [scene, slug]);
+  const model = useMemo(() => preparedClone(scene, slug), [scene, slug]);
   const { actions } = useAnimations(animations, group);
+
+  // La boîte des modèles skinnés n'est fiable qu'une fois le squelette monté.
+  // On cadre donc après le premier rendu, avec la pose réellement affichée.
+  useLayoutEffect(() => {
+    model.scale.setScalar(1);
+    model.position.set(0, 0, 0);
+    model.updateWorldMatrix(true, true);
+
+    const bounds = new THREE.Box3().setFromObject(model, true);
+    const size = bounds.getSize(new THREE.Vector3());
+    if (!Number.isFinite(size.y) || size.y < 0.00001) return;
+
+    const scale = 2.75 / size.y;
+    model.scale.setScalar(scale);
+    model.updateWorldMatrix(true, true);
+
+    const framedBounds = new THREE.Box3().setFromObject(model, true);
+    const center = framedBounds.getCenter(new THREE.Vector3());
+    model.position.set(-center.x, -0.82 - framedBounds.min.y, -center.z);
+    model.updateWorldMatrix(true, true);
+  }, [model]);
 
   useEffect(() => {
     const idle = actions["Idle"];
