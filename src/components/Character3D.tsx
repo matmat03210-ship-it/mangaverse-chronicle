@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { defaultLook, looks, type Look } from "@/data/looks";
 import { GokuModel } from "./GokuModel";
+import { ImportedCharacterModel, importedCharacterSlugs } from "./ImportedCharacterModel";
 
 /** 3-step toon ramp — donne le rendu cel-shading façon anime */
 function useToonGradient() {
@@ -350,6 +351,10 @@ export function Character3D({
         {slug === "goku" ? (
           <Suspense fallback={null}>
             <GokuModel />
+          </Suspense>
+        ) : importedCharacterSlugs.has(slug) ? (
+          <Suspense fallback={null}>
+            <ImportedCharacterModel slug={slug} />
           </Suspense>
         ) : (
           <Figure look={look} />
