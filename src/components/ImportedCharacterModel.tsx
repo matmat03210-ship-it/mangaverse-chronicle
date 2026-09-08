@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useAnimations, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { SkeletonUtils } from "three-stdlib";
 import booAsset from "@/assets/models/majin-buu.glb.asset.json";
 import vegetaAsset from "@/assets/models/vegeta.glb.asset.json";
 import trunksAsset from "@/assets/models/trunks.glb.asset.json";
@@ -24,9 +23,7 @@ const MODEL_URLS: Record<string, string> = {
 };
 
 const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
-  freezer: [-Math.PI / 2, 0, 0],
   piccolo: [Math.PI / 2, 0, 0],
-  boo: [-Math.PI / 2, 0, 0],
 };
 
 // Les fichiers viennent de logiciels différents (unités, axes et origines variés).
@@ -34,17 +31,17 @@ const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
 // à la même taille, y compris avant le démarrage de leurs squelettes.
 const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, number] }> = {
   vegeta: { scale: 1.436, position: [-0.074, -0.823, 0.902] },
-  freezer: { scale: 20, position: [0, -0.25, 0] },
-  gohan: { scale: 2, position: [0, -0.25, 0] },
-  piccolo: { scale: 0.35, position: [0, 0.1, 0] },
+  freezer: { scale: 138.6, position: [0, -0.343, -1.659] },
+  gohan: { scale: 10.055, position: [0, -0.827, 0] },
+  piccolo: { scale: 1.574, position: [0, -0.79, 0.009] },
   cell: { scale: 1.194, position: [0, -0.807, 0.327] },
-  boo: { scale: 8, position: [0, -0.2, 0] },
+  boo: { scale: 55.72, position: [0.153, -0.823, -0.879] },
   trunks: { scale: 10.881, position: [-0.076, -3.074, -1.856] },
   krilin: { scale: 0.59, position: [0, -0.82, -0.043] },
 };
 
 function preparedClone(source: THREE.Group, slug: string) {
-  const object = SkeletonUtils.clone(source);
+  const object = source.clone(true);
   const rotation = MODEL_ROTATIONS[slug];
   if (rotation) object.rotation.set(...rotation);
   const frame = MODEL_FRAMES[slug];
