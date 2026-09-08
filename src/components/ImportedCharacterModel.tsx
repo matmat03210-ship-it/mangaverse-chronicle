@@ -34,11 +34,11 @@ const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
 // à la même taille, y compris avant le démarrage de leurs squelettes.
 const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, number] }> = {
   vegeta: { scale: 1.436, position: [-0.074, -0.823, 0.902] },
-  freezer: { scale: 115.59, position: [0, -0.828, 0.749] },
-  gohan: { scale: 10.055, position: [0, -0.827, 0] },
-  piccolo: { scale: 1.574, position: [0, -0.79, 0.009] },
+  freezer: { scale: 20, position: [0, -0.25, 0] },
+  gohan: { scale: 2, position: [0, -0.25, 0] },
+  piccolo: { scale: 0.35, position: [0, 0.1, 0] },
   cell: { scale: 1.194, position: [0, -0.807, 0.327] },
-  boo: { scale: 48.98, position: [0.132, -0.82, 0.002] },
+  boo: { scale: 8, position: [0, -0.2, 0] },
   trunks: { scale: 10.881, position: [-0.076, -3.074, -1.856] },
   krilin: { scale: 0.59, position: [0, -0.82, -0.043] },
 };
