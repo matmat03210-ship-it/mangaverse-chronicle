@@ -1,8 +1,7 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useAnimations, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { SkeletonUtils } from "three-stdlib";
 import booAsset from "@/assets/models/majin-buu.glb.asset.json";
 import vegetaAsset from "@/assets/models/vegeta.glb.asset.json";
 import trunksAsset from "@/assets/models/trunks.glb.asset.json";
@@ -25,14 +24,33 @@ const MODEL_URLS: Record<string, string> = {
 
 const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
   freezer: [-Math.PI / 2, 0, 0],
-  piccolo: [-Math.PI / 2, 0, 0],
+  piccolo: [Math.PI / 2, 0, 0],
   boo: [-Math.PI / 2, 0, 0],
 };
 
+// Les fichiers viennent de logiciels différents (unités, axes et origines variés).
+// Ces cadrages utilisent leurs dimensions réelles afin de garder tous les héros
+// à la même taille, y compris avant le démarrage de leurs squelettes.
+const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, number] }> = {
+  vegeta: { scale: 1.436, position: [-0.074, -0.823, 0.902] },
+  freezer: { scale: 115.59, position: [0, -1.08, 0.749] },
+  gohan: { scale: 10.055, position: [0, -1.18, 0] },
+  piccolo: { scale: 3.6, position: [0, -0.82, 0.02] },
+  cell: { scale: 1.194, position: [0, -0.807, 0.327] },
+  boo: { scale: 48.98, position: [0.132, -0.82, 0.002] },
+  trunks: { scale: 10.881, position: [-0.076, -3.074, -1.856] },
+  krilin: { scale: 0.59, position: [0, -0.82, -0.043] },
+};
+
 function preparedClone(source: THREE.Group, slug: string) {
-  const object = SkeletonUtils.clone(source);
+  const object = source.clone(true);
   const rotation = MODEL_ROTATIONS[slug];
   if (rotation) object.rotation.set(...rotation);
+  const frame = MODEL_FRAMES[slug];
+  if (frame) {
+    object.scale.setScalar(frame.scale);
+    object.position.set(...frame.position);
+  }
 
   object.traverse((child) => {
     const mesh = child as THREE.Mesh;
@@ -60,39 +78,8 @@ function preparedClone(source: THREE.Group, slug: string) {
 export function ImportedCharacterModel({ slug }: { slug: string }) {
   const url = MODEL_URLS[slug] ?? vegetaAsset.url;
   const group = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF(url);
+  const { scene } = useGLTF(url);
   const model = useMemo(() => preparedClone(scene, slug), [scene, slug]);
-  const { actions } = useAnimations(animations, group);
-
-  // La boîte des modèles skinnés n'est fiable qu'une fois le squelette monté.
-  // On cadre donc après le premier rendu, avec la pose réellement affichée.
-  useLayoutEffect(() => {
-    model.scale.setScalar(1);
-    model.position.set(0, 0, 0);
-    model.updateWorldMatrix(true, true);
-
-    const bounds = new THREE.Box3().setFromObject(model, true);
-    const size = bounds.getSize(new THREE.Vector3());
-    if (!Number.isFinite(size.y) || size.y < 0.00001) return;
-
-    const scale = 2.75 / size.y;
-    model.scale.setScalar(scale);
-    model.updateWorldMatrix(true, true);
-
-    const framedBounds = new THREE.Box3().setFromObject(model, true);
-    const center = framedBounds.getCenter(new THREE.Vector3());
-    model.position.set(-center.x, -0.82 - framedBounds.min.y, -center.z);
-    model.updateWorldMatrix(true, true);
-  }, [model]);
-
-  useEffect(() => {
-    const idle = actions["Idle"];
-    if (!idle) return;
-    idle.reset().fadeIn(0.25).play();
-    return () => {
-      idle.fadeOut(0.2);
-    };
-  }, [actions]);
 
   useFrame((state) => {
     if (group.current) {
