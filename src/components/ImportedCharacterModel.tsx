@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useAnimations, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import booAsset from "@/assets/models/majin-buu.glb.asset.json";
 import vegetaAsset from "@/assets/models/vegeta.glb.asset.json";
@@ -76,18 +76,8 @@ function preparedClone(source: THREE.Group, slug: string) {
 export function ImportedCharacterModel({ slug }: { slug: string }) {
   const url = MODEL_URLS[slug] ?? vegetaAsset.url;
   const group = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF(url);
+  const { scene } = useGLTF(url);
   const model = useMemo(() => preparedClone(scene, slug), [scene, slug]);
-  const { actions } = useAnimations(animations, group);
-
-  useEffect(() => {
-    const idle = actions["Idle"];
-    if (!idle) return;
-    idle.reset().fadeIn(0.25).play();
-    return () => {
-      idle.fadeOut(0.2);
-    };
-  }, [actions]);
 
   useFrame((state) => {
     if (group.current) {
