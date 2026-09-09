@@ -330,6 +330,7 @@ export function Character3D({
   useEffect(() => setMounted(true), []);
 
   const look = looks[slug] ?? defaultLook;
+  const cameraDistance = slug === "piccolo" ? 3 : slug === "cell" ? 3.4 : 4.6;
 
   if (!mounted) return <div className={className} aria-hidden />;
 
@@ -338,7 +339,7 @@ export function Character3D({
       <Canvas
         shadows
         dpr={[1, 1.6]}
-        camera={{ position: [0, 0.35, 4.6], fov: 42 }}
+        camera={{ position: [0, 0.35, cameraDistance], fov: 42 }}
         gl={{ antialias: true }}
       >
         <ambientLight intensity={0.75} />
@@ -369,8 +370,8 @@ export function Character3D({
           autoRotateSpeed={1.6}
           minPolarAngle={Math.PI / 3.2}
           maxPolarAngle={Math.PI / 1.9}
-          minDistance={3}
-          maxDistance={5.5}
+          minDistance={cameraDistance * 0.65}
+          maxDistance={cameraDistance * 1.2}
         />
       </Canvas>
     </div>

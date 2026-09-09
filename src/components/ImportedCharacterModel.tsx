@@ -28,19 +28,68 @@ const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
   boo: [-Math.PI / 2, 0, 0],
 };
 
-// Les fichiers viennent de logiciels différents (unités, axes et origines variés).
-// Ces cadrages utilisent leurs dimensions réelles afin de garder tous les héros
-// à la même taille, y compris avant le démarrage de leurs squelettes.
 const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, number] }> = {
-  vegeta: { scale: 1.436, position: [-0.074, -0.823, 0.902] },
-  freezer: { scale: 115.59, position: [0, -1.08, 0.749] },
-  gohan: { scale: 10.055, position: [0, -1.18, 0] },
-  piccolo: { scale: 3.6, position: [0, -0.82, 0.02] },
-  cell: { scale: 1.194, position: [0, -0.807, 0.327] },
-  boo: { scale: 48.98, position: [0.132, -0.82, 0.002] },
-  trunks: { scale: 10.881, position: [-0.076, -3.074, -1.856] },
-  krilin: { scale: 0.59, position: [0, -0.82, -0.043] },
+  vegeta: { scale: 1.58, position: [-0.081, -0.84, 0.992] },
+  freezer: { scale: 127.15, position: [0, -1.1, 0.824] },
+  gohan: { scale: 11.06, position: [0, -1.2, 0] },
+  piccolo: { scale: 8.1, position: [0, -1.66, 0.03] },
+  cell: { scale: 1.55, position: [0, -0.87, 0.425] },
+  boo: { scale: 53.88, position: [0.145, -0.84, 0.002] },
+  trunks: { scale: 11.64, position: [-0.081, -3.23, -1.986] },
+  krilin: { scale: 0.68, position: [0, -0.84, -0.05] },
 };
+
+function removeTrunksStand(geometry: THREE.BufferGeometry) {
+  const positions = geometry.getAttribute("position");
+  const indices = geometry.getIndex();
+  if (!positions || !indices) return geometry;
+
+  const kept: number[] = [];
+  for (let i = 0; i < indices.count; i += 3) {
+    const a = indices.getX(i);
+    const b = indices.getX(i + 1);
+    const c = indices.getX(i + 2);
+    const isStand = positions.getZ(a) < 0.219 && positions.getZ(b) < 0.219 && positions.getZ(c) < 0.219;
+    if (!isStand) kept.push(a, b, c);
+  }
+
+  const cleaned = geometry.clone();
+  cleaned.setIndex(kept);
+  cleaned.computeBoundingBox();
+  cleaned.computeBoundingSphere();
+  return cleaned;
+}
+
+function restorePiccoloColors(geometry: THREE.BufferGeometry) {
+  const sourceColors = geometry.getAttribute("color");
+  const positions = geometry.getAttribute("position");
+  if (!sourceColors || !positions) return geometry;
+
+  const corrected = geometry.clone();
+  const colors = new Float32Array(sourceColors.count * 4);
+  const green = new THREE.Color("#65c84a");
+  const purple = new THREE.Color("#5c2a92");
+  const pink = new THREE.Color("#dc73a8");
+  const boots = new THREE.Color("#7a5838");
+
+  for (let i = 0; i < sourceColors.count; i += 1) {
+    const x = positions.getX(i);
+    const y = positions.getY(i);
+    const r = sourceColors.getX(i);
+    const g = sourceColors.getY(i);
+    const b = sourceColors.getZ(i);
+    const isPinkDetail = r > 0.65 && b > 0.65 && g < 0.45;
+    const isSkin = y > 1.36 || (y > 0.48 && y < 1.38 && Math.abs(x) > 0.31);
+    const color = y < 0.2 ? boots : isPinkDetail ? pink : isSkin ? green : purple;
+    colors[i * 4] = color.r;
+    colors[i * 4 + 1] = color.g;
+    colors[i * 4 + 2] = color.b;
+    colors[i * 4 + 3] = 1;
+  }
+
+  corrected.setAttribute("color", new THREE.BufferAttribute(colors, 4));
+  return corrected;
+}
 
 function preparedClone(source: THREE.Group, slug: string) {
   const object = source.clone(true);
@@ -59,11 +108,23 @@ function preparedClone(source: THREE.Group, slug: string) {
     mesh.receiveShadow = true;
     mesh.frustumCulled = false;
 
-    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    if (slug === "trunks") mesh.geometry = removeTrunksStand(mesh.geometry);
+    if (slug === "piccolo") mesh.geometry = restorePiccoloColors(mesh.geometry);
+
+    const materials = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map((material) =>
+      material.clone(),
+    );
+    const firstMaterial = materials[0];
+    if (!firstMaterial) return;
+    mesh.material = Array.isArray(mesh.material) ? materials : firstMaterial;
     for (const material of materials) {
       if (!(material instanceof THREE.MeshStandardMaterial)) continue;
       material.roughness = 0.82;
       material.metalness = Math.min(material.metalness, 0.08);
+      if (slug === "piccolo") {
+        material.color.set("#ffffff");
+        material.vertexColors = true;
+      }
       if (material.map) {
         material.map.colorSpace = THREE.SRGBColorSpace;
         material.map.anisotropy = 4;
