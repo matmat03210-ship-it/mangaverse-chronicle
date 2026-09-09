@@ -29,14 +29,14 @@ const MODEL_ROTATIONS: Partial<Record<string, [number, number, number]>> = {
 };
 
 const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, number] }> = {
-  vegeta: { scale: 1.436, position: [-0.074, -0.823, 0.902] },
-  freezer: { scale: 115.59, position: [0, -1.08, 0.749] },
-  gohan: { scale: 10.055, position: [0, -1.18, 0] },
-  piccolo: { scale: 5.4, position: [0, -1.4, 0.02] },
-  cell: { scale: 1.194, position: [0, -0.807, 0.327] },
-  boo: { scale: 48.98, position: [0.132, -0.82, 0.002] },
-  trunks: { scale: 10.881, position: [-0.076, -3.074, -1.856] },
-  krilin: { scale: 0.59, position: [0, -0.82, -0.043] },
+  vegeta: { scale: 1.58, position: [-0.081, -0.84, 0.992] },
+  freezer: { scale: 127.15, position: [0, -1.1, 0.824] },
+  gohan: { scale: 11.06, position: [0, -1.2, 0] },
+  piccolo: { scale: 8.1, position: [0, -1.66, 0.03] },
+  cell: { scale: 1.55, position: [0, -0.87, 0.425] },
+  boo: { scale: 53.88, position: [0.145, -0.84, 0.002] },
+  trunks: { scale: 11.64, position: [-0.081, -3.23, -1.986] },
+  krilin: { scale: 0.68, position: [0, -0.84, -0.05] },
 };
 
 function removeTrunksStand(geometry: THREE.BufferGeometry) {
