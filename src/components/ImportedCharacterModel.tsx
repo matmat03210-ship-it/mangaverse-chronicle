@@ -2,6 +2,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { SkeletonUtils } from "three-stdlib";
 import booAsset from "@/assets/models/majin-buu.glb.asset.json";
 import vegetaAsset from "@/assets/models/vegeta.glb.asset.json";
 import trunksAsset from "@/assets/models/trunks.glb.asset.json";
@@ -32,12 +33,43 @@ const MODEL_FRAMES: Record<string, { scale: number; position: [number, number, n
   vegeta: { scale: 1.58, position: [-0.081, -0.84, 0.992] },
   freezer: { scale: 127.15, position: [0, -1.1, 0.824] },
   gohan: { scale: 11.06, position: [0, -1.2, 0] },
-  piccolo: { scale: 8.1, position: [0, -1.66, 0.03] },
-  cell: { scale: 1.55, position: [0, -0.87, 0.425] },
+  piccolo: { scale: 12.42, position: [0, -2.06, 0.03] },
+  cell: { scale: 2.1, position: [0, -0.87, 0.425] },
   boo: { scale: 53.88, position: [0.145, -0.84, 0.002] },
   trunks: { scale: 11.64, position: [-0.081, -3.23, -1.986] },
   krilin: { scale: 0.68, position: [0, -0.84, -0.05] },
 };
+
+const RELAXED_ARM_CHARACTERS = new Set(["vegeta", "gohan", "piccolo", "cell", "boo"]);
+
+function armSide(name: string) {
+  const normalized = name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  const isPrimaryUpperArm =
+    /mixamorig_leftarm(?:_|$)/.test(normalized) ||
+    /mixamorig_rightarm(?:_|$)/.test(normalized) ||
+    /(?:^|_)upperarm_[lr](?:_|$)/.test(normalized) ||
+    /(?:^|_)uparm_[lr](?:_|$)/.test(normalized) ||
+    /(?:^|_)shoulder_[lr](?:_|$)/.test(normalized);
+
+  if (!isPrimaryUpperArm || /twist|look|deform|constraint|roll/.test(normalized)) return null;
+  if (/(?:leftarm|upperarm_l|uparm_l|shoulder_l)/.test(normalized)) return "left";
+  if (/(?:rightarm|upperarm_r|uparm_r|shoulder_r)/.test(normalized)) return "right";
+  return null;
+}
+
+function relaxTPoseArms(object: THREE.Object3D, slug: string) {
+  if (!RELAXED_ARM_CHARACTERS.has(slug)) return;
+
+  object.traverse((child) => {
+    if (!(child instanceof THREE.Bone)) return;
+    const side = armSide(child.name);
+    if (!side) return;
+    const angle = side === "left" ? -Math.PI * 0.34 : Math.PI * 0.34;
+    const lowered = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+    child.quaternion.premultiply(lowered);
+  });
+  object.updateWorldMatrix(true, true);
+}
 
 function removeTrunksStand(geometry: THREE.BufferGeometry) {
   const positions = geometry.getAttribute("position");
@@ -92,9 +124,10 @@ function restorePiccoloColors(geometry: THREE.BufferGeometry) {
 }
 
 function preparedClone(source: THREE.Group, slug: string) {
-  const object = source.clone(true);
+  const object = SkeletonUtils.clone(source);
   const rotation = MODEL_ROTATIONS[slug];
   if (rotation) object.rotation.set(...rotation);
+  relaxTPoseArms(object, slug);
   const frame = MODEL_FRAMES[slug];
   if (frame) {
     object.scale.setScalar(frame.scale);
