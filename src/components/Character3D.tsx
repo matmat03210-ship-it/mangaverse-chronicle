@@ -330,7 +330,7 @@ export function Character3D({
   useEffect(() => setMounted(true), []);
 
   const look = looks[slug] ?? defaultLook;
-  const cameraDistance = 4.6;
+  const cameraDistance = 5.2;
 
   if (!mounted) return <div className={className} aria-hidden />;
 

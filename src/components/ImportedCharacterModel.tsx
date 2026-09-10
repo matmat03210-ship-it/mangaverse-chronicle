@@ -2,7 +2,6 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { SkeletonUtils } from "three-stdlib";
 import booAsset from "@/assets/models/majin-buu.glb.asset.json";
 import vegetaAsset from "@/assets/models/vegeta.glb.asset.json";
 import trunksAsset from "@/assets/models/trunks.glb.asset.json";
@@ -60,14 +59,38 @@ function armSide(name: string) {
 function relaxTPoseArms(object: THREE.Object3D, slug: string) {
   if (!RELAXED_ARM_CHARACTERS.has(slug)) return;
 
+  object.updateWorldMatrix(true, true);
+  const upperArms: Array<{ bone: THREE.Bone; side: "left" | "right" }> = [];
   object.traverse((child) => {
     if (!(child instanceof THREE.Bone)) return;
     const side = armSide(child.name);
     if (!side) return;
-    const angle = side === "left" ? -Math.PI * 0.34 : Math.PI * 0.34;
-    const lowered = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
-    child.quaternion.premultiply(lowered);
+    upperArms.push({ bone: child, side });
   });
+
+  for (const { bone, side } of upperArms) {
+    const descendants: THREE.Bone[] = [];
+    bone.traverse((child) => {
+      if (child instanceof THREE.Bone && child !== bone) descendants.push(child);
+    });
+    const forearm = descendants.find((child) => /forearm|lowerarm|elbow/i.test(child.name));
+    const nextJoint = forearm ?? descendants[0];
+    if (!nextJoint || !bone.parent) continue;
+
+    object.updateWorldMatrix(true, true);
+    const shoulderPosition = bone.getWorldPosition(new THREE.Vector3());
+    const elbowPosition = nextJoint.getWorldPosition(new THREE.Vector3());
+    const currentDirection = elbowPosition.sub(shoulderPosition).normalize();
+    if (currentDirection.lengthSq() < 0.5) continue;
+
+    const outward = side === "left" ? -0.2 : 0.2;
+    const desiredDirection = new THREE.Vector3(outward, -1, 0.06).normalize();
+    const correction = new THREE.Quaternion().setFromUnitVectors(currentDirection, desiredDirection);
+    const worldRotation = bone.getWorldQuaternion(new THREE.Quaternion());
+    const parentRotation = bone.parent.getWorldQuaternion(new THREE.Quaternion());
+    bone.quaternion.copy(parentRotation.invert().multiply(correction.multiply(worldRotation)));
+    bone.updateWorldMatrix(false, true);
+  }
   object.updateWorldMatrix(true, true);
 }
 
@@ -124,7 +147,7 @@ function restorePiccoloColors(geometry: THREE.BufferGeometry) {
 }
 
 function preparedClone(source: THREE.Group, slug: string) {
-  const object = SkeletonUtils.clone(source);
+  const object = source.clone(true);
   const rotation = MODEL_ROTATIONS[slug];
   if (rotation) object.rotation.set(...rotation);
   relaxTPoseArms(object, slug);
